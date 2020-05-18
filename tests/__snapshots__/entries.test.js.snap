@@ -1,0 +1,94 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`circular dependencies 1`] = `
+Array [
+  Array [
+    "module1:",
+    "from entry",
+  ],
+  Array [
+    "main:",
+    "from module1",
+  ],
+]
+`;
+
+exports[`circular dependencies 2`] = `
+Array [
+  Array [
+    "main:",
+    Object {},
+  ],
+  Array [
+    "module1:",
+    "from entry",
+  ],
+]
+`;
+
+exports[`filename 1`] = `
+Array [
+  Array [
+    "entry",
+  ],
+  Array [
+    "module1",
+  ],
+  Array [
+    "module2",
+  ],
+  Array [
+    "index",
+  ],
+]
+`;
+
+exports[`nested 1`] = `
+Array [
+  Array [
+    "module1",
+  ],
+  Array [
+    "module1-sub",
+  ],
+  Array [
+    "entry",
+  ],
+]
+`;
+
+exports[`node_modules 1`] = `
+Array [
+  Array [
+    "16.13.1",
+  ],
+]
+`;
+
+exports[`simple 1`] = `
+Array [
+  Array [
+    "entry",
+  ],
+  Array [
+    "module1",
+  ],
+  Array [
+    "module2: value",
+  ],
+  Array [
+    "module2: fn",
+  ],
+  Array [
+    "module3",
+    "from module1.js",
+  ],
+  Array [
+    "sep----",
+  ],
+  Array [
+    "module3",
+    "from entry.js",
+  ],
+]
+`;

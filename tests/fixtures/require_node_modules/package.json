@@ -1,0 +1,14 @@
+{
+  "name": "require_node_modules",
+  "version": "1.0.0",
+  "description": "",
+  "main": "entry.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "hiroppy <git@hiroppy.me> (https://hiroppy.me)",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^16.13.1"
+  }
+}
