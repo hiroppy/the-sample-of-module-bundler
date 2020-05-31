@@ -112,6 +112,15 @@ function transformToCjs(entryDir, modulesMap) {
             // replace `['foo'].foo` with `['foo']`
             path.parentPath.replaceWith(assignment);
           } else {
+            /**
+             *  (0, __BUNDLE__{id}['name'])(args);
+             *  path.parentPath.replaceWith(
+             *    t.callExpression(
+             *      t.sequenceExpression([t.numericLiteral(0), assignment]),
+             *      path.node.arguments
+             *    )
+             *  );
+             */
             path.replaceWith(assignment);
           }
         }
