@@ -3,7 +3,7 @@
 const { join, extname, dirname, basename } = require('path');
 
 function isNodeModule(filename) {
-  return filename.startsWith('.');
+  return !filename.startsWith('.');
 }
 
 function getFilename(filename) {
@@ -21,7 +21,7 @@ function getFilename(filename) {
 }
 
 function getScriptFilePath(basePath, filename) {
-  if (isNodeModule(filename)) {
+  if (!isNodeModule(filename)) {
     return join(basePath, getFilename(filename));
   }
 
@@ -46,5 +46,6 @@ function getScriptFilePath(basePath, filename) {
 
 module.exports = {
   isNodeModule,
+  getFilename,
   getScriptFilePath,
 };

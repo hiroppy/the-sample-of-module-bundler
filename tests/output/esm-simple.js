@@ -15,20 +15,28 @@
       return module.exports;
     }
     
+    require.__defineExports = (exports, exporters) => {
+      Object.entries(exporters).forEach(([key, value]) => {
+        Object.defineProperty(exports, key, {
+          enumerable: true,
+          get: value
+        });
+      });
+    }
+    
     return require(0);
   })({
     0: function(module, exports, require) {
-    const a = require(1);
+    const __BUNDLER__1 = require(1);
 
-console.log('module1:', a);
-module.exports = 'from module1';
+console.log(__BUNDLER__1["add"](10));
   },1: function(module, exports, require) {
-    'use strict';
+    function add(n) {
+  return 10 + n;
+}
 
-module.exports = 'from entry';
-
-const a = require(0);
-
-console.log('main:', a);
+require.__defineExports(exports, {
+  "add": () => add
+});
   }
   });

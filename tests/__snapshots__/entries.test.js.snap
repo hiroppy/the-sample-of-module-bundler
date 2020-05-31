@@ -26,6 +26,51 @@ Array [
 ]
 `;
 
+exports[`esm 1`] = `
+Array [
+  Array [
+    "1. default: named",
+    "named: module2Value",
+  ],
+  Array [
+    "2. default: arguments",
+    "from entry-point",
+  ],
+  Array [
+    "3. default: anonymous",
+    "from module1 from entry-point",
+  ],
+  Array [
+    "4. named: func",
+  ],
+  Array [
+    6,
+  ],
+  Array [
+    "5. module3 value",
+  ],
+  Array [
+    "5. module3 value",
+  ],
+]
+`;
+
+exports[`esm-node_modules 1`] = `
+Array [
+  Array [
+    "16.13.1",
+  ],
+]
+`;
+
+exports[`esm-simple 1`] = `
+Array [
+  Array [
+    20,
+  ],
+]
+`;
+
 exports[`filename 1`] = `
 Array [
   Array [
