@@ -77,8 +77,29 @@ test('filename', async () => {
 });
 
 test('node_modules', async () => {
-  await build('require_node_modules/entry.js', 'nm.js');
-  await runGeneratedCodeInVM('./output/nm.js');
+  await build('cjs-node-modules/entry.js', 'cjs-node-modules.js');
+  await runGeneratedCodeInVM('./output/cjs-node-modules.js');
+
+  expect(console.log.mock.calls).toMatchSnapshot();
+});
+
+test('esm-simple', async () => {
+  await build('esm-simple/entry.js', 'esm-simple.js');
+  await runGeneratedCodeInVM('./output/esm-simple.js');
+
+  expect(console.log.mock.calls).toMatchSnapshot();
+});
+
+test('esm', async () => {
+  await build('esm/entry.js', 'esm.js');
+  await runGeneratedCodeInVM('./output/esm.js');
+
+  expect(console.log.mock.calls).toMatchSnapshot();
+});
+
+test('esm-node_modules', async () => {
+  await build('esm-node-modules/entry.js', 'esm-node-modules.js');
+  await runGeneratedCodeInVM('./output/esm-node-modules.js');
 
   expect(console.log.mock.calls).toMatchSnapshot();
 });
