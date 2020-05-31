@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`circular dependencies 1`] = `
+exports[`cjs circular dependencies 1`] = `
 Array [
   Array [
     "module1:",
@@ -13,7 +13,7 @@ Array [
 ]
 `;
 
-exports[`circular dependencies 2`] = `
+exports[`cjs circular dependencies 2`] = `
 Array [
   Array [
     "main:",
@@ -26,7 +26,74 @@ Array [
 ]
 `;
 
-exports[`esm 1`] = `
+exports[`cjs filename 1`] = `
+Array [
+  Array [
+    "entry",
+  ],
+  Array [
+    "module1",
+  ],
+  Array [
+    "module2",
+  ],
+  Array [
+    "index",
+  ],
+]
+`;
+
+exports[`cjs nested 1`] = `
+Array [
+  Array [
+    "module1",
+  ],
+  Array [
+    "module1-sub",
+  ],
+  Array [
+    "entry",
+  ],
+]
+`;
+
+exports[`cjs node_modules 1`] = `
+Array [
+  Array [
+    "16.13.1",
+  ],
+]
+`;
+
+exports[`cjs simple 1`] = `
+Array [
+  Array [
+    "entry",
+  ],
+  Array [
+    "module1",
+  ],
+  Array [
+    "module2: value",
+  ],
+  Array [
+    "module2: fn",
+  ],
+  Array [
+    "module3",
+    "from module1.js",
+  ],
+  Array [
+    "sep----",
+  ],
+  Array [
+    "module3",
+    "from entry.js",
+  ],
+]
+`;
+
+exports[`esm esm 1`] = `
 Array [
   Array [
     "1. default: named",
@@ -55,7 +122,7 @@ Array [
 ]
 `;
 
-exports[`esm-node_modules 1`] = `
+exports[`esm esm-node_modules 1`] = `
 Array [
   Array [
     "16.13.1",
@@ -63,77 +130,10 @@ Array [
 ]
 `;
 
-exports[`esm-simple 1`] = `
+exports[`esm esm-simple 1`] = `
 Array [
   Array [
     20,
-  ],
-]
-`;
-
-exports[`filename 1`] = `
-Array [
-  Array [
-    "entry",
-  ],
-  Array [
-    "module1",
-  ],
-  Array [
-    "module2",
-  ],
-  Array [
-    "index",
-  ],
-]
-`;
-
-exports[`nested 1`] = `
-Array [
-  Array [
-    "module1",
-  ],
-  Array [
-    "module1-sub",
-  ],
-  Array [
-    "entry",
-  ],
-]
-`;
-
-exports[`node_modules 1`] = `
-Array [
-  Array [
-    "16.13.1",
-  ],
-]
-`;
-
-exports[`simple 1`] = `
-Array [
-  Array [
-    "entry",
-  ],
-  Array [
-    "module1",
-  ],
-  Array [
-    "module2: value",
-  ],
-  Array [
-    "module2: fn",
-  ],
-  Array [
-    "module3",
-    "from module1.js",
-  ],
-  Array [
-    "sep----",
-  ],
-  Array [
-    "module3",
-    "from entry.js",
   ],
 ]
 `;

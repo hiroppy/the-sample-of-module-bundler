@@ -31,75 +31,81 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-test('not found a module', async () => {
-  await build('notFoundModule/entry.js', 'module.js');
+describe('common', () => {
+  test('not found a module', async () => {
+    await build('notFoundModule/entry.js', 'module.js');
 
-  expect(console.warn.mock.calls[0][0].includes('could not find the module:')).toBeTruthy();
+    expect(console.warn.mock.calls[0][0].includes('could not find the module:')).toBeTruthy();
+  });
 });
 
-test('simple', async () => {
-  await build('simple/entry.js', 'simple.js');
-  await runGeneratedCodeInVM('./output/simple.js');
-
-  expect(console.log.mock.calls).toMatchSnapshot();
-});
-
-test('nested', async () => {
-  await build('nested/entry.js', 'nested.js');
-  await runGeneratedCodeInVM('./output/nested.js');
-
-  expect(console.log.mock.calls).toMatchSnapshot();
-});
-
-test('circular dependencies', async () => {
-  {
-    await build('circularDependency/entry.js', 'circularDependency.js');
-    await runGeneratedCodeInVM('./output/circularDependency.js');
+describe('cjs', () => {
+  test('simple', async () => {
+    await build('simple/entry.js', 'simple.js');
+    await runGeneratedCodeInVM('./output/simple.js');
 
     expect(console.log.mock.calls).toMatchSnapshot();
-  }
+  });
 
-  jest.clearAllMocks();
-
-  {
-    await build('circularDependency/module1.js', 'circularDependency.js');
-    await runGeneratedCodeInVM('./output/circularDependency.js');
+  test('nested', async () => {
+    await build('nested/entry.js', 'nested.js');
+    await runGeneratedCodeInVM('./output/nested.js');
 
     expect(console.log.mock.calls).toMatchSnapshot();
-  }
+  });
+
+  test('circular dependencies', async () => {
+    {
+      await build('circularDependency/entry.js', 'circularDependency.js');
+      await runGeneratedCodeInVM('./output/circularDependency.js');
+
+      expect(console.log.mock.calls).toMatchSnapshot();
+    }
+
+    jest.clearAllMocks();
+
+    {
+      await build('circularDependency/module1.js', 'circularDependency.js');
+      await runGeneratedCodeInVM('./output/circularDependency.js');
+
+      expect(console.log.mock.calls).toMatchSnapshot();
+    }
+  });
+
+  test('filename', async () => {
+    await build('filename/entry.js', 'filename.js');
+    await runGeneratedCodeInVM('./output/filename.js');
+
+    expect(console.log.mock.calls).toMatchSnapshot();
+  });
+
+  test('node_modules', async () => {
+    await build('cjs-node-modules/entry.js', 'cjs-node-modules.js');
+    await runGeneratedCodeInVM('./output/cjs-node-modules.js');
+
+    expect(console.log.mock.calls).toMatchSnapshot();
+  });
 });
 
-test('filename', async () => {
-  await build('filename/entry.js', 'filename.js');
-  await runGeneratedCodeInVM('./output/filename.js');
+describe('esm', () => {
+  test('esm-simple', async () => {
+    await build('esm-simple/entry.js', 'esm-simple.js');
+    await runGeneratedCodeInVM('./output/esm-simple.js');
 
-  expect(console.log.mock.calls).toMatchSnapshot();
-});
+    expect(console.log.mock.calls).toMatchSnapshot();
+  });
 
-test('node_modules', async () => {
-  await build('cjs-node-modules/entry.js', 'cjs-node-modules.js');
-  await runGeneratedCodeInVM('./output/cjs-node-modules.js');
+  test('esm', async () => {
+    await build('esm/entry.js', 'esm.js');
+    await runGeneratedCodeInVM('./output/esm.js');
 
-  expect(console.log.mock.calls).toMatchSnapshot();
-});
+    expect(console.log.mock.calls).toMatchSnapshot();
+  });
 
-test('esm-simple', async () => {
-  await build('esm-simple/entry.js', 'esm-simple.js');
-  await runGeneratedCodeInVM('./output/esm-simple.js');
+  test('esm-node_modules', async () => {
+    await build('esm-node-modules/entry.js', 'esm-node-modules.js');
+    await runGeneratedCodeInVM('./output/esm-node-modules.js');
 
-  expect(console.log.mock.calls).toMatchSnapshot();
-});
-
-test('esm', async () => {
-  await build('esm/entry.js', 'esm.js');
-  await runGeneratedCodeInVM('./output/esm.js');
-
-  expect(console.log.mock.calls).toMatchSnapshot();
-});
-
-test('esm-node_modules', async () => {
-  await build('esm-node-modules/entry.js', 'esm-node-modules.js');
-  await runGeneratedCodeInVM('./output/esm-node-modules.js');
-
-  expect(console.log.mock.calls).toMatchSnapshot();
+    expect(console.log.mock.calls).toMatchSnapshot();
+  });
 });
