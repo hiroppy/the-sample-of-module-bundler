@@ -110,9 +110,7 @@ async function bundler({ entry, output }) {
   const entryDir = dirname(entry);
   const { modulesMap, isESM } = await buildModulesMap(entryDir, entryFilename);
 
-  if (isESM) {
-    transformToCjs(entryDir, modulesMap);
-  }
+  transformToCjs(entryDir, modulesMap);
 
   const modules = convertToModuleId(entryDir, modulesMap);
 
