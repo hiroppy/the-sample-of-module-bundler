@@ -14,7 +14,7 @@
 
       return module.exports;
     }
-    
+
     require.__defineExports = (exports, exporters) => {
       Object.entries(exporters).forEach(([key, value]) => {
         Object.defineProperty(exports, key, {
@@ -23,20 +23,36 @@
         });
       });
     }
-    
-    return require(0);
+
+    require.__addEsmFlag = (exports) => {
+      Object.defineProperty(exports, '__esModule', { value: true });
+    }
+
+    require.__getDefaultExports = (module) => {
+      const getter = module.__esModule ? () => module['default'] : () => module;
+
+      require.__defineExports(getter, { d: getter });
+
+      return getter;
+    }
+
+    return require(1);
   })({
     0: function(module, exports, require) {
-    const __BUNDLER__1 = require(1);
+    require.__addEsmFlag(exports)
 
-console.log(__BUNDLER__1["add"](10));
-  },1: function(module, exports, require) {
-    function add(n) {
+function add(n) {
   return 10 + n;
 }
 
 require.__defineExports(exports, {
   "add": () => add
 });
+  },1: function(module, exports, require) {
+    require.__addEsmFlag(exports)
+
+const __BUNDLER__0 = require(0);
+
+console.log(__BUNDLER__0["add"](10));
   }
   });

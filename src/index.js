@@ -4,81 +4,70 @@ const { promises, readFileSync } = require('fs');
 const { extname, dirname, basename, relative, join, resolve } = require('path');
 const { default: traverse } = require('@babel/traverse');
 const { default: generate } = require('@babel/generator');
-const { transformToCjs } = require('./transformToCjs');
+const { transformAst } = require('./transformAst');
 const { mainTemplate, moduleTemplate, registerESMTemplate } = require('./template');
 const { parse } = require('./utils/parser');
 const { getScriptFilePath } = require('./utils/path');
-const { getModuleId, resolveModulePath } = require('./utils/module');
+const { getModule, resolveModulePath } = require('./utils/module');
 
 async function buildModulesMap(entryDir, entryFilename) {
   const modulesMap = new Set();
-  const entryPath = getScriptFilePath(entryDir, `./${entryFilename}`);
+  const entryPath = getScriptFilePath(entryDir, entryFilename);
   const entryCodeAst = parse(await promises.readFile(entryPath, 'utf8'));
-  let isESM = false;
-
-  // add an entry point
-  modulesMap.add({
-    id: 0,
-    path: entryPath, // an absolute path
-    ast: entryCodeAst,
-  });
+  const visitedFiles = [];
 
   // start from the entry-point to check all deps
-  walkDeps(entryCodeAst, entryDir, entryPath);
+  walkDeps(entryDir, entryPath, entryFilename);
 
-  function walkDeps(ast, currentDir, beforePath) {
-    traverse(ast, {
-      // import
-      ImportDeclaration({ node: { type, source } }) {
-        isESM = true;
+  function walkDeps(currentDir, beforePath, src) {
+    const { nextRoot, filePath } = resolveModulePath(src, entryDir, beforePath);
 
-        const { nextRoot, filePath } = resolveModulePath(source.value, entryDir, beforePath);
-        const hasAlreadyModule = Array.from(modulesMap).some(({ path }) => path === filePath);
+    if (visitedFiles.includes(filePath)) {
+      return;
+    }
 
-        if (!hasAlreadyModule) {
-          try {
-            const ast = parse(readFileSync(filePath, 'utf-8'));
+    visitedFiles.push(filePath);
 
-            modulesMap.add({
-              id: modulesMap.size,
-              ast,
-              path: filePath,
-            });
+    try {
+      const ast = parse(readFileSync(filePath, 'utf-8'));
+      let type = 'esm';
 
-            walkDeps(ast, nextRoot, filePath);
-          } catch (e) {
-            console.warn('could not find the module:', e.message);
+      traverse(ast, {
+        // import
+        ImportDeclaration({ node: { type, source } }) {
+          type = 'esm';
+          walkDeps(nextRoot, filePath, source.value);
+        },
+
+        // require
+        CallExpression({ node: { callee, arguments: args } }) {
+          if (callee.type === 'Identifier' && callee.name === 'require') {
+            type = 'cjs';
+            walkDeps(nextRoot, filePath, args[0].value);
           }
-        }
-      },
+        },
 
-      // require
-      CallExpression({ node: { callee, arguments: args } }) {
-        if (callee.type === 'Identifier' && callee.name === 'require') {
-          const { nextRoot, filePath } = resolveModulePath(args[0].value, entryDir, beforePath);
-          const hasAlreadyModule = Array.from(modulesMap).some(({ path }) => path === filePath);
-
-          if (!hasAlreadyModule) {
-            try {
-              const ast = parse(readFileSync(filePath, 'utf-8'));
-
-              modulesMap.add({
-                id: modulesMap.size,
-                ast,
-                path: filePath,
-              });
-
-              walkDeps(ast, nextRoot, filePath);
-            } catch (e) {
-              console.warn('could not find the module:', e.message);
-            }
+        // check ESM or CJS
+        // exports or module.exports or ESM export
+        ExpressionStatement({ node: { expression } }) {
+          if (expression.operator === '=') {
+            type = 'cjs';
           }
-        }
-      },
-    });
+        },
+      });
+
+      modulesMap.add({
+        id: modulesMap.size, // the entry point's id is 0
+        ast,
+        path: filePath, // an absolute path
+        type, // in fact, CJS as default is better
+      });
+    } catch (e) {
+      console.warn('could not find the module:', filePath);
+    }
   }
 
-  return { modulesMap, isESM };
+  return modulesMap;
 }
 
 // replace a module path with a moduleId
@@ -89,7 +78,7 @@ function convertToModuleId(basePath, modulesMap) {
     traverse(ast, {
       CallExpression({ node: { callee, arguments: args } }) {
         if (callee.type === 'Identifier' && callee.name === 'require') {
-          const moduleId = getModuleId(modulesMap, path, args[0].value, basePath);
+          const { id: moduleId } = getModule(modulesMap, path, args[0].value, basePath);
 
           args[0].value = moduleId;
         }
@@ -108,14 +97,16 @@ function convertToModuleId(basePath, modulesMap) {
 async function bundler({ entry, output }) {
   const entryFilename = basename(entry);
   const entryDir = dirname(entry);
-  const { modulesMap, isESM } = await buildModulesMap(entryDir, entryFilename);
+  const modulesMap = await buildModulesMap(entryDir, `./${entryFilename}`);
+  const hasEsmModules = Array.from(modulesMap.values()).some(({ type }) => type === 'esm');
+  const { id: entryPointId } = Array.from(modulesMap).find(({ path }) => path === entry);
 
-  transformToCjs(entryDir, modulesMap);
+  transformAst(entryDir, modulesMap);
 
   const modules = convertToModuleId(entryDir, modulesMap);
 
   // export bundled code
-  await promises.writeFile(output, mainTemplate(modules, 0, isESM));
+  await promises.writeFile(output, mainTemplate(modules, entryPointId, hasEsmModules));
 }
 
 module.exports = bundler;

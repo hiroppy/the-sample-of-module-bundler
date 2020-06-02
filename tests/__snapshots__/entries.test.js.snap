@@ -127,6 +127,9 @@ Array [
   Array [
     "16.13.1",
   ],
+  Array [
+    "16.13.1",
+  ],
 ]
 `;
 
@@ -134,6 +137,35 @@ exports[`esm esm-simple 1`] = `
 Array [
   Array [
     20,
+  ],
+]
+`;
+
+exports[`esm-and-cjs interop 1`] = `
+Array [
+  Array [
+    "hello world from cjs",
+  ],
+  Array [
+    "hello world from esm",
+  ],
+  Array [
+    "default from cjs",
+  ],
+  Array [
+    "default from esm",
+  ],
+  Array [
+    "---- default.js ----",
+  ],
+  Array [
+    "default from esm",
+  ],
+  Array [
+    "default from cjs",
+  ],
+  Array [
+    "---- default.js ----",
   ],
 ]
 `;

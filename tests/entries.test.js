@@ -109,3 +109,12 @@ describe('esm', () => {
     expect(console.log.mock.calls).toMatchSnapshot();
   });
 });
+
+describe('esm-and-cjs', () => {
+  test('interop', async () => {
+    await build('esm-and-cjs/entry.js', 'esm-and-cjs.js');
+    await runGeneratedCodeInVM('./output/esm-and-cjs.js');
+
+    expect(console.log.mock.calls).toMatchSnapshot();
+  });
+});
