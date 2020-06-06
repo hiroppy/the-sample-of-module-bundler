@@ -150,6 +150,16 @@ function transformAst(entryDir, modulesMap) {
           importSource,
           entryDir
         );
+
+        // import 'module';
+        if (path.node.specifiers.length === 0) {
+          path.replaceWith(
+            t.callExpression(t.identifier('require'), [t.stringLiteral(importSource)])
+          );
+
+          return;
+        }
+
         const nodeType = path.node.specifiers[0].type;
         // for import { default as A } from 'module'
         const hasDefault =
@@ -171,7 +181,6 @@ function transformAst(entryDir, modulesMap) {
          * const __BUNDLER__1 = require(1);
          * const __BUNDLER__1__DEFAULT = require.__getDefaultExports(__BUNDLER__1);
          */
-        // TODO: import 'module'
         if (
           nodeType === 'ImportNamespaceSpecifier' ||
           nodeType === 'ImportDefaultSpecifier' ||

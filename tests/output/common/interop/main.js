@@ -100,16 +100,10 @@ const __BUNDLER__1 = require(1);
 
 const __BUNDLER__1_DEFAULT = require.__getDefaultExports(__BUNDLER__1);
 
-function main() {
-  console.log('---- default.js ----');
-  console.log(__BUNDLER__3_DEFAULT.d);
-  console.log(__BUNDLER__1_DEFAULT.d.default);
-  console.log('---- default.js ----');
-}
-
-require.__defineExports(exports, {
-  "default": () => main
-});
+console.log('---- default.js ----');
+console.log(__BUNDLER__3_DEFAULT.d);
+console.log(__BUNDLER__1_DEFAULT.d.default);
+console.log('---- default.js ----');
   },5: function(module, exports, require) {
     require.__addEsmFlag(exports)
 
@@ -121,9 +115,7 @@ const __BUNDLER__3 = require(3);
 
 const __BUNDLER__3_DEFAULT = require.__getDefaultExports(__BUNDLER__3);
 
-const __BUNDLER__4 = require(4);
-
-const __BUNDLER__4_DEFAULT = require.__getDefaultExports(__BUNDLER__4);
+require(4);
 
 __BUNDLER__1.say(__BUNDLER__1.helloWorld);
 
@@ -131,7 +123,5 @@ __BUNDLER__3.say(__BUNDLER__3.helloWorld);
 
 console.log(__BUNDLER__1_DEFAULT.d.default);
 console.log(__BUNDLER__3_DEFAULT.d);
-
-__BUNDLER__4_DEFAULT.d();
   }
   });

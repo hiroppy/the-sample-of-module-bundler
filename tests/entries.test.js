@@ -96,6 +96,7 @@ describe('esm', () => {
     'default',
     'specifier',
     'namespaceSpecifier',
+    'import',
   ];
 
   for (const dir of dirs) {
