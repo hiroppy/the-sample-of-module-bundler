@@ -109,7 +109,7 @@ Array [
 ]
 `;
 
-exports[`esm complicated 1`] = `
+exports[`esm complication 1`] = `
 Array [
   Array [
     "1. default: named",
@@ -138,6 +138,23 @@ Array [
 ]
 `;
 
+exports[`esm default 1`] = `
+Array [
+  Array [
+    "hi",
+  ],
+]
+`;
+
+exports[`esm namespaceSpecifier 1`] = `
+Array [
+  Array [
+    "hi",
+    "world",
+  ],
+]
+`;
+
 exports[`esm node-modules 1`] = `
 Array [
   Array [
@@ -153,6 +170,15 @@ exports[`esm simple 1`] = `
 Array [
   Array [
     20,
+  ],
+]
+`;
+
+exports[`esm specifier 1`] = `
+Array [
+  Array [
+    "hi",
+    "world",
   ],
 ]
 `;

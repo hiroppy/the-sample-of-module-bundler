@@ -89,7 +89,14 @@ describe('esm', () => {
     await createDir(outputPath, '');
   });
 
-  const dirs = ['simple', 'complicated', 'node-modules'];
+  const dirs = [
+    'simple',
+    'complication',
+    'node-modules',
+    'default',
+    'specifier',
+    'namespaceSpecifier',
+  ];
 
   for (const dir of dirs) {
     test(dir, async () => {
