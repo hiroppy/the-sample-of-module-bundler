@@ -13,10 +13,10 @@ async function buildModulesMap(entryDir, entryFilename) {
   const visitedFiles = [];
 
   // start from the entry-point to check all deps
-  walkDeps(entryDir, entryPath, entryFilename);
+  walkDeps(entryPath, entryFilename);
 
-  function walkDeps(currentDir, beforePath, src) {
-    const { nextRoot, filePath } = resolveModulePath(src, entryDir, beforePath);
+  function walkDeps(prevPath, src) {
+    const filePath = resolveModulePath(src, entryDir, prevPath);
 
     if (visitedFiles.includes(filePath)) {
       return;
@@ -32,14 +32,14 @@ async function buildModulesMap(entryDir, entryFilename) {
         // import
         ImportDeclaration({ node: { type, source } }) {
           type = 'esm';
-          walkDeps(nextRoot, filePath, source.value);
+          walkDeps(filePath, source.value);
         },
 
         // require
         CallExpression({ node: { callee, arguments: args } }) {
           if (callee.type === 'Identifier' && callee.name === 'require') {
             type = 'cjs';
-            walkDeps(nextRoot, filePath, args[0].value);
+            walkDeps(filePath, args[0].value);
           }
         },
 

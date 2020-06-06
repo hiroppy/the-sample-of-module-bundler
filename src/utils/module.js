@@ -7,17 +7,11 @@ function resolveModulePath(modulePath, baseRoot, beforeModulePath) {
   // reset the current directory when node_modules
   // ./ has 2 types which are local of the first party and local of the third party module
   if (isNodeModule(modulePath)) {
-    return {
-      nextRoot: baseRoot,
-      filePath: getScriptFilePath(baseRoot, modulePath),
-    };
+    return getScriptFilePath(baseRoot, modulePath);
   } else {
     const nextRoot = dirname(beforeModulePath);
 
-    return {
-      nextRoot,
-      filePath: resolve(nextRoot, getFilename(modulePath)),
-    };
+    return resolve(nextRoot, getFilename(modulePath));
   }
 }
 
