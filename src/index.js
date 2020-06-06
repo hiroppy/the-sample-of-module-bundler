@@ -4,6 +4,7 @@ const { promises, readFileSync } = require('fs');
 const { extname, dirname, basename, relative, join, resolve } = require('path');
 const { default: traverse } = require('@babel/traverse');
 const { default: generate } = require('@babel/generator');
+const Terser = require('terser');
 const { transformAst } = require('./transformAst');
 const { mainTemplate, moduleTemplate, registerESMTemplate } = require('./template');
 const { parse } = require('./utils/parser');
@@ -97,6 +98,7 @@ function convertToModuleId(basePath, modulesMap) {
 async function bundler({ entry, output }) {
   const entryFilename = basename(entry);
   const entryDir = dirname(entry);
+  const minifiedFilename = `${basename(output).split('.js')[0]}.min.js`;
   const modulesMap = await buildModulesMap(entryDir, `./${entryFilename}`);
   const hasEsmModules = Array.from(modulesMap.values()).some(({ type }) => type === 'esm');
   const { id: entryPointId } = Array.from(modulesMap).find(({ path }) => path === entry);
@@ -104,9 +106,16 @@ async function bundler({ entry, output }) {
   transformAst(entryDir, modulesMap);
 
   const modules = convertToModuleId(entryDir, modulesMap);
+  const outputCode = mainTemplate(modules, entryPointId, hasEsmModules);
+  const { code: minifiedCode, error: terserError } = Terser.minify(outputCode);
 
-  // export bundled code
-  await promises.writeFile(output, mainTemplate(modules, entryPointId, hasEsmModules));
+  if (terserError) {
+    console.error(terserError);
+  } else {
+    // export bundled code
+    await promises.writeFile(output, outputCode);
+    await promises.writeFile(join(dirname(output), minifiedFilename), minifiedCode);
+  }
 }
 
 module.exports = bundler;
