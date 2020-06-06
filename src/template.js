@@ -1,6 +1,6 @@
 'use strict';
 
-const mainTemplate = (modules, entryPoint, isESM) =>
+const mainTemplate = (modules, entryPoint, hasESM) =>
   `
   ((modules) => {
     const usedModules = {};
@@ -18,10 +18,24 @@ const mainTemplate = (modules, entryPoint, isESM) =>
 
       return module.exports;
     }
-    ${
-      isESM
-        ? `
-    require.__defineExports = (exports, exporters) => {
+
+    ${hasESM ? defineExports() : ''}
+
+    ${hasESM ? addEsmFlag() : ''}
+
+    ${getDefaultExports()}
+
+    return require(${entryPoint});
+  })({
+    ${Array.from(modules.entries())
+      .map(([id, { code }]) => `${id}: ${code}`)
+      .join(',')}
+  });
+`.trim();
+
+const defineExports = () =>
+  `
+  require.__defineExports = (exports, exporters) => {
       Object.entries(exporters).forEach(([key, value]) => {
         Object.defineProperty(exports, key, {
           enumerable: true,
@@ -29,15 +43,25 @@ const mainTemplate = (modules, entryPoint, isESM) =>
         });
       });
     }
-    `
-        : ''
+`.trim();
+
+const addEsmFlag = () =>
+  `
+  require.__addEsmFlag = (exports) => {
+      Object.defineProperty(exports, '__esModule', { value: true });
     }
-    return require(${entryPoint});
-  })({
-    ${Array.from(modules.entries())
-      .map(([id, { code }]) => `${id}: ${code}`)
-      .join(',')}
-  });
+`.trim();
+
+// keep for compatibility between ESM and CJS
+const getDefaultExports = () =>
+  `
+  require.__getDefaultExports = (module) => {
+      const getter = module.__esModule ? () => module['default'] : () => module;
+
+      require.__defineExports(getter, { d: getter });
+
+      return getter;
+    }
 `.trim();
 
 const moduleTemplate = (content) =>

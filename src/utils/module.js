@@ -21,18 +21,17 @@ function resolveModulePath(modulePath, baseRoot, beforeModulePath) {
   }
 }
 
-function getModuleId(modulesMap, currentModulePath, moduleName, basePath) {
+function getModule(modulesMap, currentModulePath, moduleName, basePath) {
   const filePath = getScriptFilePath(
     !isNodeModule(moduleName) ? dirname(currentModulePath) : basePath,
     moduleName
   );
-  const { id } = Array.from(modulesMap.values()).find(({ path }) => path === filePath) || {};
 
-  return id;
+  return Array.from(modulesMap.values()).find(({ path }) => path === filePath) || {};
 }
 
 module.exports = {
   isNodeModule,
-  getModuleId,
+  getModule,
   resolveModulePath,
 };

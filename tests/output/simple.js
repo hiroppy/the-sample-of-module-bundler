@@ -14,40 +14,22 @@
 
       return module.exports;
     }
+
     
-    return require(0);
+
+    
+
+    require.__getDefaultExports = (module) => {
+      const getter = module.__esModule ? () => module['default'] : () => module;
+
+      require.__defineExports(getter, { d: getter });
+
+      return getter;
+    }
+
+    return require(3);
   })({
     0: function(module, exports, require) {
-    'use strict';
-
-const module1 = require(1);
-
-console.log('entry');
-module1();
-
-const module3 = require(3);
-
-console.log('sep----');
-module3('from entry.js');
-  },1: function(module, exports, require) {
-    'use strict';
-
-module.exports = () => {
-  console.log('module1');
-
-  const {
-    fn,
-    v
-  } = require(2);
-
-  console.log(v);
-  console.log(fn());
-
-  const module3 = require(3);
-
-  module3('from module1.js');
-};
-  },2: function(module, exports, require) {
     'use strict';
 
 function fn() {
@@ -59,11 +41,41 @@ module.exports = {
   fn,
   v
 };
-  },3: function(module, exports, require) {
+  },1: function(module, exports, require) {
     function m(txt) {
   console.log('module3', txt);
 }
 
 module.exports = m;
+  },2: function(module, exports, require) {
+    'use strict';
+
+module.exports = () => {
+  console.log('module1');
+
+  const {
+    fn,
+    v
+  } = require(0);
+
+  console.log(v);
+  console.log(fn());
+
+  const module3 = require(1);
+
+  module3('from module1.js');
+};
+  },3: function(module, exports, require) {
+    'use strict';
+
+const module1 = require(2);
+
+console.log('entry');
+module1();
+
+const module3 = require(1);
+
+console.log('sep----');
+module3('from entry.js');
   }
   });

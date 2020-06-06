@@ -14,24 +14,46 @@
 
       return module.exports;
     }
-    
-    return require(0);
+
+    require.__defineExports = (exports, exporters) => {
+      Object.entries(exporters).forEach(([key, value]) => {
+        Object.defineProperty(exports, key, {
+          enumerable: true,
+          get: value
+        });
+      });
+    }
+
+    require.__addEsmFlag = (exports) => {
+      Object.defineProperty(exports, '__esModule', { value: true });
+    }
+
+    require.__getDefaultExports = (module) => {
+      const getter = module.__esModule ? () => module['default'] : () => module;
+
+      require.__defineExports(getter, { d: getter });
+
+      return getter;
+    }
+
+    return require(3);
   })({
     0: function(module, exports, require) {
-    console.log('entry');
-
-require(1);
+    console.log('module2');
 
 require(3);
   },1: function(module, exports, require) {
     console.log('module1');
 
-require(2);
-  },2: function(module, exports, require) {
-    console.log('module2');
-
 require(0);
+  },2: function(module, exports, require) {
+    require.__addEsmFlag(exports)
+console.log('index');
   },3: function(module, exports, require) {
-    console.log('index');
+    console.log('entry');
+
+require(1);
+
+require(2);
   }
   });

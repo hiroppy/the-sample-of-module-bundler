@@ -14,7 +14,7 @@
 
       return module.exports;
     }
-    
+
     require.__defineExports = (exports, exporters) => {
       Object.entries(exporters).forEach(([key, value]) => {
         Object.defineProperty(exports, key, {
@@ -23,35 +23,47 @@
         });
       });
     }
-    
-    return require(0);
+
+    require.__addEsmFlag = (exports) => {
+      Object.defineProperty(exports, '__esModule', { value: true });
+    }
+
+    require.__getDefaultExports = (module) => {
+      const getter = module.__esModule ? () => module['default'] : () => module;
+
+      require.__defineExports(getter, { d: getter });
+
+      return getter;
+    }
+
+    return require(3);
   })({
     0: function(module, exports, require) {
-    const __BUNDLER__1 = require(1);
+    require.__addEsmFlag(exports)
+const value = 'named: module2Value';
+const value2 = 'named: module2Value2';
 
-const __BUNDLER__3 = require(3);
-
-__BUNDLER__1["default"]('from entry-point');
-
-__BUNDLER__1["namedFunc"]();
-
-console.log(Object.keys(__BUNDLER__3).length);
-console.log(__BUNDLER__3["default"]);
-console.log(__BUNDLER__3["value"]);
-
-function __default__() {}
+const __default__ = str => {
+  console.log('3. default: anonymous', str);
+};
 
 require.__defineExports(exports, {
+  "value": () => value,
+  "value2": () => value2,
   "default": () => __default__
 });
   },1: function(module, exports, require) {
-    const __BUNDLER__2 = require(2);
+    require.__addEsmFlag(exports)
+
+const __BUNDLER__0 = require(0);
+
+const __BUNDLER__0_DEFAULT = require.__getDefaultExports(__BUNDLER__0);
 
 function defaultNamedExport(str) {
-  console.log('1. default: named', __BUNDLER__2["value"]);
+  console.log('1. default: named', __BUNDLER__0["value"]);
   console.log('2. default: arguments', str);
 
-  __BUNDLER__2["default"](`from module1 ${str}`);
+  __BUNDLER__0_DEFAULT.d(`from module1 ${str}`);
 }
 
 function namedFunc() {
@@ -69,20 +81,8 @@ require.__defineExports(exports, {
   "namedFunc": () => namedFunc
 });
   },2: function(module, exports, require) {
-    const value = 'named: module2Value';
-const value2 = 'named: module2Value2';
-
-const __default__ = str => {
-  console.log('3. default: anonymous', str);
-};
-
-require.__defineExports(exports, {
-  "value": () => value,
-  "value2": () => value2,
-  "default": () => __default__
-});
-  },3: function(module, exports, require) {
-    const value = '5. module3 value';
+    require.__addEsmFlag(exports)
+const value = '5. module3 value';
 const value2 = 2;
 
 const fn = () => {};
@@ -98,6 +98,30 @@ require.__defineExports(exports, {
   "fn2": () => fn2,
   "A": () => A,
   "default": () => value
+});
+  },3: function(module, exports, require) {
+    require.__addEsmFlag(exports)
+
+const __BUNDLER__1 = require(1);
+
+const __BUNDLER__1_DEFAULT = require.__getDefaultExports(__BUNDLER__1);
+
+const __BUNDLER__2 = require(2);
+
+const __BUNDLER__2_DEFAULT = require.__getDefaultExports(__BUNDLER__2);
+
+__BUNDLER__1_DEFAULT.d('from entry-point');
+
+__BUNDLER__1["namedFunc"]();
+
+console.log(Object.keys(__BUNDLER__2).length);
+console.log(__BUNDLER__2_DEFAULT.d);
+console.log(__BUNDLER__2.value);
+
+function __default__() {}
+
+require.__defineExports(exports, {
+  "default": () => __default__
 });
   }
   });
