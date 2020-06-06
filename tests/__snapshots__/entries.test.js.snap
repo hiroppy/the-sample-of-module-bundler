@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`cjs circular dependencies 1`] = `
+exports[`cjs circularDependency 1`] = `
 Array [
   Array [
     "module1:",
@@ -9,19 +9,6 @@ Array [
   Array [
     "main:",
     "from module1",
-  ],
-]
-`;
-
-exports[`cjs circular dependencies 2`] = `
-Array [
-  Array [
-    "main:",
-    Object {},
-  ],
-  Array [
-    "module1:",
-    "from entry",
   ],
 ]
 `;
@@ -57,7 +44,7 @@ Array [
 ]
 `;
 
-exports[`cjs node_modules 1`] = `
+exports[`cjs node-modules 1`] = `
 Array [
   Array [
     "16.13.1",
@@ -93,7 +80,36 @@ Array [
 ]
 `;
 
-exports[`esm esm 1`] = `
+exports[`common interop 1`] = `
+Array [
+  Array [
+    "hello world from cjs",
+  ],
+  Array [
+    "hello world from esm",
+  ],
+  Array [
+    "default from cjs",
+  ],
+  Array [
+    "default from esm",
+  ],
+  Array [
+    "---- default.js ----",
+  ],
+  Array [
+    "default from esm",
+  ],
+  Array [
+    "default from cjs",
+  ],
+  Array [
+    "---- default.js ----",
+  ],
+]
+`;
+
+exports[`esm complicated 1`] = `
 Array [
   Array [
     "1. default: named",
@@ -122,7 +138,7 @@ Array [
 ]
 `;
 
-exports[`esm esm-node_modules 1`] = `
+exports[`esm node-modules 1`] = `
 Array [
   Array [
     "16.13.1",
@@ -133,39 +149,10 @@ Array [
 ]
 `;
 
-exports[`esm esm-simple 1`] = `
+exports[`esm simple 1`] = `
 Array [
   Array [
     20,
-  ],
-]
-`;
-
-exports[`esm-and-cjs interop 1`] = `
-Array [
-  Array [
-    "hello world from cjs",
-  ],
-  Array [
-    "hello world from esm",
-  ],
-  Array [
-    "default from cjs",
-  ],
-  Array [
-    "default from esm",
-  ],
-  Array [
-    "---- default.js ----",
-  ],
-  Array [
-    "default from esm",
-  ],
-  Array [
-    "default from cjs",
-  ],
-  Array [
-    "---- default.js ----",
   ],
 ]
 `;

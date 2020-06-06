@@ -1,25 +1,30 @@
 'use strict';
 
-const { readFile } = require('fs').promises;
+const { readFile, mkdir } = require('fs').promises;
 const { Script, runInContext, createContext } = require('vm');
 const { join } = require('path');
 const bundler = require('../src');
 
+const fixtureBasePath = join(__dirname, 'fixtures');
 const outputBasePath = join(__dirname, 'output');
 
-async function build(fixture, filename) {
+async function build(fixturePath, outputPath, type) {
   await bundler({
-    entry: join(__dirname, 'fixtures', fixture),
-    output: join(outputBasePath, filename),
+    entry: join(fixturePath, type, 'entry.js'),
+    output: join(outputPath, type, 'main.js'),
   });
 }
 
-async function runGeneratedCodeInVM(file) {
-  const code = await readFile(join(__dirname, file), 'utf-8');
+async function runGeneratedCodeInVM(outputPath, lastType) {
+  const code = await readFile(join(outputPath, lastType, 'main.js'), 'utf-8');
   const sandbox = { console, process };
   const ctx = new createContext(sandbox);
 
   runInContext(code, ctx);
+}
+
+async function createDir(base, lastType) {
+  await mkdir(join(base, lastType), { recursive: true });
 }
 
 beforeEach(() => {
@@ -32,89 +37,67 @@ afterEach(() => {
 });
 
 describe('common', () => {
+  const fixturePath = join(fixtureBasePath, 'common');
+  const outputPath = join(outputBasePath, 'common');
+
+  beforeAll(async () => {
+    await createDir(outputPath, '');
+  });
+
   test('not found a module', async () => {
-    await build('notFoundModule/entry.js', 'module.js');
+    await createDir(outputPath, 'notFoundModule');
+    await build(fixturePath, outputPath, 'notFoundModule');
 
     expect(console.warn.mock.calls[0][0].includes('could not find the module:')).toBeTruthy();
+  });
+
+  test('interop', async () => {
+    await createDir(outputPath, 'interop');
+    await build(fixturePath, outputPath, 'interop');
+    await runGeneratedCodeInVM(outputPath, 'interop');
+
+    expect(console.log.mock.calls).toMatchSnapshot();
   });
 });
 
 describe('cjs', () => {
-  test('simple', async () => {
-    await build('simple/entry.js', 'simple.js');
-    await runGeneratedCodeInVM('./output/simple.js');
+  const fixturePath = join(fixtureBasePath, 'cjs');
+  const outputPath = join(outputBasePath, 'cjs');
 
-    expect(console.log.mock.calls).toMatchSnapshot();
+  beforeAll(async () => {
+    await createDir(outputPath, '');
   });
 
-  test('nested', async () => {
-    await build('nested/entry.js', 'nested.js');
-    await runGeneratedCodeInVM('./output/nested.js');
+  const dirs = ['simple', 'nested', 'circularDependency', 'filename', 'node-modules'];
 
-    expect(console.log.mock.calls).toMatchSnapshot();
-  });
-
-  test('circular dependencies', async () => {
-    {
-      await build('circularDependency/entry.js', 'circularDependency.js');
-      await runGeneratedCodeInVM('./output/circularDependency.js');
+  for (const dir of dirs) {
+    test(dir, async () => {
+      await createDir(outputPath, dir);
+      await build(fixturePath, outputPath, dir);
+      await runGeneratedCodeInVM(outputPath, dir);
 
       expect(console.log.mock.calls).toMatchSnapshot();
-    }
-
-    jest.clearAllMocks();
-
-    {
-      await build('circularDependency/module1.js', 'circularDependency.js');
-      await runGeneratedCodeInVM('./output/circularDependency.js');
-
-      expect(console.log.mock.calls).toMatchSnapshot();
-    }
-  });
-
-  test('filename', async () => {
-    await build('filename/entry.js', 'filename.js');
-    await runGeneratedCodeInVM('./output/filename.js');
-
-    expect(console.log.mock.calls).toMatchSnapshot();
-  });
-
-  test('node_modules', async () => {
-    await build('cjs-node-modules/entry.js', 'cjs-node-modules.js');
-    await runGeneratedCodeInVM('./output/cjs-node-modules.js');
-
-    expect(console.log.mock.calls).toMatchSnapshot();
-  });
+    });
+  }
 });
 
 describe('esm', () => {
-  test('esm-simple', async () => {
-    await build('esm-simple/entry.js', 'esm-simple.js');
-    await runGeneratedCodeInVM('./output/esm-simple.js');
+  const fixturePath = join(fixtureBasePath, 'esm');
+  const outputPath = join(outputBasePath, 'esm');
 
-    expect(console.log.mock.calls).toMatchSnapshot();
+  beforeAll(async () => {
+    await createDir(outputPath, '');
   });
 
-  test('esm', async () => {
-    await build('esm/entry.js', 'esm.js');
-    await runGeneratedCodeInVM('./output/esm.js');
+  const dirs = ['simple', 'complicated', 'node-modules'];
 
-    expect(console.log.mock.calls).toMatchSnapshot();
-  });
+  for (const dir of dirs) {
+    test(dir, async () => {
+      await createDir(outputPath, dir);
+      await build(fixturePath, outputPath, dir);
+      await runGeneratedCodeInVM(outputPath, dir);
 
-  test('esm-node_modules', async () => {
-    await build('esm-node-modules/entry.js', 'esm-node-modules.js');
-    await runGeneratedCodeInVM('./output/esm-node-modules.js');
-
-    expect(console.log.mock.calls).toMatchSnapshot();
-  });
-});
-
-describe('esm-and-cjs', () => {
-  test('interop', async () => {
-    await build('esm-and-cjs/entry.js', 'esm-and-cjs.js');
-    await runGeneratedCodeInVM('./output/esm-and-cjs.js');
-
-    expect(console.log.mock.calls).toMatchSnapshot();
-  });
+      expect(console.log.mock.calls).toMatchSnapshot();
+    });
+  }
 });
