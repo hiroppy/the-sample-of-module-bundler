@@ -4,7 +4,7 @@ Introducing how to create a module bundler.
 
 ## Feature
 
-You can see output codes [here](./test/output).
+You can see output codes [here](./tests/output).
 
 | Implementation Contents                                                         | Output Code                                                                                                  |
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
