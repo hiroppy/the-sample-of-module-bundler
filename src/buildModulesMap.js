@@ -9,7 +9,6 @@ const { resolveModulePath } = require('./utils/module');
 async function buildModulesMap(entryDir, entryFilename) {
   const modulesMap = new Set();
   const entryPath = getScriptFilePath(entryDir, entryFilename);
-  const entryCodeAst = parse(await promises.readFile(entryPath, 'utf8'));
   const visitedFiles = [];
 
   // start from the entry-point to check all deps

@@ -170,7 +170,7 @@ function transformAst(entryDir, modulesMap) {
           t.variableDeclaration('const', [
             t.variableDeclarator(
               t.identifier(valueName),
-              // bundle can change the ID from require('module')
+              // bundler can change the ID from require('module')
               t.callExpression(t.identifier('require'), [t.stringLiteral(importSource)])
             ),
           ])
@@ -207,8 +207,8 @@ function transformAst(entryDir, modulesMap) {
            * export default a;
            */ (node.declaration.id && node.declaration.id.name) ||
           /* export const a = 1*/ (node.declaration.declarations &&
-            node.declaration.declarations[0].id.name);
-        null;
+            node.declaration.declarations[0].id.name) ||
+          null;
 
         switch (path.type) {
           case 'ExportDefaultDeclaration': {
@@ -272,6 +272,6 @@ function transformAst(entryDir, modulesMap) {
 }
 
 module.exports = {
-  transformAst: transformAst,
+  transformAst,
   prefix,
 };

@@ -78,7 +78,6 @@ const registerExportConfigTemplate = (exporters) =>
       })
       .join(',\n')}
   });
-
 `.trim();
 
 module.exports = {
