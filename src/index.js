@@ -1,99 +1,13 @@
 'use strict';
 
 const { promises, readFileSync } = require('fs');
-const { extname, dirname, basename, relative, join, resolve } = require('path');
-const { default: traverse } = require('@babel/traverse');
-const { default: generate } = require('@babel/generator');
+const { dirname, basename, join } = require('path');
 const Terser = require('terser');
-const { transformAst } = require('./transformAst');
-const { mainTemplate, moduleTemplate, registerESMTemplate } = require('./template');
-const { parse } = require('./utils/parser');
-const { getScriptFilePath } = require('./utils/path');
+const { mainTemplate } = require('./template');
 const { getModule, resolveModulePath } = require('./utils/module');
-
-async function buildModulesMap(entryDir, entryFilename) {
-  const modulesMap = new Set();
-  const entryPath = getScriptFilePath(entryDir, entryFilename);
-  const entryCodeAst = parse(await promises.readFile(entryPath, 'utf8'));
-  const visitedFiles = [];
-
-  // start from the entry-point to check all deps
-  walkDeps(entryDir, entryPath, entryFilename);
-
-  function walkDeps(currentDir, beforePath, src) {
-    const { nextRoot, filePath } = resolveModulePath(src, entryDir, beforePath);
-
-    if (visitedFiles.includes(filePath)) {
-      return;
-    }
-
-    visitedFiles.push(filePath);
-
-    try {
-      const ast = parse(readFileSync(filePath, 'utf-8'));
-      let type = 'esm';
-
-      traverse(ast, {
-        // import
-        ImportDeclaration({ node: { type, source } }) {
-          type = 'esm';
-          walkDeps(nextRoot, filePath, source.value);
-        },
-
-        // require
-        CallExpression({ node: { callee, arguments: args } }) {
-          if (callee.type === 'Identifier' && callee.name === 'require') {
-            type = 'cjs';
-            walkDeps(nextRoot, filePath, args[0].value);
-          }
-        },
-
-        // check ESM or CJS
-        // exports or module.exports or ESM export
-        ExpressionStatement({ node: { expression } }) {
-          if (expression.operator === '=') {
-            type = 'cjs';
-          }
-        },
-      });
-
-      modulesMap.add({
-        id: modulesMap.size, // the entry point's id is 0
-        ast,
-        path: filePath, // an absolute path
-        type, // in fact, CJS as default is better
-      });
-    } catch (e) {
-      console.warn('could not find the module:', filePath);
-    }
-  }
-
-  return modulesMap;
-}
-
-// replace a module path with a moduleId
-function convertToModuleId(basePath, modulesMap) {
-  const modules = new Map();
-
-  for (const { id, ast, path } of modulesMap.values()) {
-    traverse(ast, {
-      CallExpression({ node: { callee, arguments: args } }) {
-        if (callee.type === 'Identifier' && callee.name === 'require') {
-          const { id: moduleId } = getModule(modulesMap, path, args[0].value, basePath);
-
-          args[0].value = moduleId;
-        }
-      },
-    });
-
-    modules.set(id, {
-      path,
-      code: moduleTemplate(generate(ast).code),
-    });
-  }
-
-  return modules;
-}
+const { transformAst } = require('./transformAst');
+const { buildModulesMap } = require('./buildModulesMap');
+const { convertToModuleId } = require('./convertToModuleId');
 
 async function bundler({ entry, output }) {
   const entryFilename = basename(entry);
@@ -107,15 +21,11 @@ async function bundler({ entry, output }) {
 
   const modules = convertToModuleId(entryDir, modulesMap);
   const outputCode = mainTemplate(modules, entryPointId, hasEsmModules);
-  const { code: minifiedCode, error: terserError } = Terser.minify(outputCode);
+  const { code: minifiedCode } = Terser.minify(outputCode);
 
-  if (terserError) {
-    console.error(terserError);
-  } else {
-    // export bundled code
-    await promises.writeFile(output, outputCode);
-    await promises.writeFile(join(dirname(output), minifiedFilename), minifiedCode);
-  }
+  // export bundled code
+  await promises.writeFile(output, outputCode);
+  await promises.writeFile(join(dirname(output), minifiedFilename), minifiedCode);
 }
 
 module.exports = bundler;
