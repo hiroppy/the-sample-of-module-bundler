@@ -19,7 +19,7 @@ You can see output codes [here](./tests/output).
 | node_modules with ESM                                                           | [esm/node-modules](./tests/output/esm/node-modules/main.js)                                                  |
 | interop between CJS and ESM                                                     | [common/interop](./tests/output/common/interop/main.js)                                                      |
 
-## Build
+## Development
 
 ```sh
 $ npm i

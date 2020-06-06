@@ -14,7 +14,7 @@
 
       return module.exports;
     }
-
+    
     require.__defineExports = (exports, exporters) => {
       Object.entries(exporters).forEach(([key, value]) => {
         Object.defineProperty(exports, key, {

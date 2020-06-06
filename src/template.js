@@ -18,11 +18,15 @@ const mainTemplate = (modules, entryPoint, hasESM) =>
 
       return module.exports;
     }
+    ${
+      hasESM
+        ? `
+    ${defineExports()}
 
-    ${hasESM ? defineExports() : ''}
-
-    ${hasESM ? addEsmFlag() : ''}
-
+    ${addEsmFlag()}
+`
+        : ''
+    }
     ${getDefaultExports()}
 
     return require(${entryPoint});
@@ -34,35 +38,29 @@ const mainTemplate = (modules, entryPoint, hasESM) =>
 `.trim();
 
 const defineExports = () =>
-  `
-  require.__defineExports = (exports, exporters) => {
+  `require.__defineExports = (exports, exporters) => {
       Object.entries(exporters).forEach(([key, value]) => {
         Object.defineProperty(exports, key, {
           enumerable: true,
           get: value
         });
       });
-    }
-`.trim();
+    }`;
 
 const addEsmFlag = () =>
-  `
-  require.__addEsmFlag = (exports) => {
+  `require.__addEsmFlag = (exports) => {
       Object.defineProperty(exports, '__esModule', { value: true });
-    }
-`.trim();
+    }`;
 
 // keep for compatibility between ESM and CJS
 const getDefaultExports = () =>
-  `
-  require.__getDefaultExports = (module) => {
+  `require.__getDefaultExports = (module) => {
       const getter = module.__esModule ? () => module['default'] : () => module;
 
       require.__defineExports(getter, { d: getter });
 
       return getter;
-    }
-`.trim();
+    }`;
 
 const moduleTemplate = (content) =>
   `
