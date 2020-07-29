@@ -4,6 +4,7 @@ const { readFile, mkdir } = require('fs').promises;
 const { Script, runInContext, createContext } = require('vm');
 const { join } = require('path');
 const bundler = require('../src');
+const { exportAllDeclaration } = require('@babel/types');
 
 const fixtureBasePath = join(__dirname, 'fixtures');
 const outputBasePath = join(__dirname, 'output');
@@ -45,10 +46,12 @@ describe('common', () => {
   });
 
   test('not found a module', async () => {
-    await createDir(outputPath, 'notFoundModule');
-    await build(fixturePath, outputPath, 'notFoundModule');
-
-    expect(console.warn.mock.calls[0][0].includes('could not find the module:')).toBeTruthy();
+    try {
+      await createDir(outputPath, 'notFoundModule');
+      await build(fixturePath, outputPath, 'notFoundModule');
+    } catch (e) {
+      expect(e.message.includes('could not find the module:')).toBeTruthy();
+    }
   });
 
   test('interop', async () => {

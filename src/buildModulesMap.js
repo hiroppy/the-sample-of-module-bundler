@@ -21,51 +21,51 @@ async function buildModulesMap(entryDir, entryFilename) {
       return;
     }
 
-    visitedFiles.push(filePath);
+    let ast;
+    let moduleType = 'none';
 
     try {
-      const ast = parse(readFileSync(filePath, 'utf-8'));
-      let moduleType = 'none';
-
-      traverse(ast, {
-        // ESM: import
-        ImportDeclaration({ node: { type, source } }) {
-          moduleType = 'esm';
-          walkDeps(filePath, source.value);
-        },
-
-        // CJS: require
-        CallExpression({ node: { callee, arguments: args } }) {
-          if (callee.type === 'Identifier' && callee.name === 'require') {
-            moduleType = 'cjs';
-            walkDeps(filePath, args[0].value);
-          }
-        },
-
-        // ESM: export
-        ExportDeclaration() {
-          moduleType = 'esm';
-        },
-
-        // check ESM or CJS
-        // exports or module.exports or ESM export
-        ExpressionStatement({ node: { expression } }) {
-          // module.exports
-          if (expression.operator === '=') {
-            moduleType = 'cjs';
-          }
-        },
-      });
-
-      modulesMap.add({
-        id: modulesMap.size, // 0 is the first id
-        ast,
-        path: filePath, // an absolute path
-        type: moduleType,
-      });
+      ast = parse(readFileSync(filePath, 'utf-8'));
     } catch (e) {
-      console.warn('could not find the module:', filePath);
+      throw new Error(`could not find the module: ${filePath}`);
     }
+
+    visitedFiles.push(filePath);
+
+    traverse(ast, {
+      // ESM: import
+      ImportDeclaration({ node: { type, source } }) {
+        moduleType = 'esm';
+        walkDeps(filePath, source.value);
+      },
+
+      // CJS: require
+      CallExpression({ node: { callee, arguments: args } }) {
+        if (callee.type === 'Identifier' && callee.name === 'require') {
+          moduleType = 'cjs';
+          walkDeps(filePath, args[0].value);
+        }
+      },
+
+      // ESM: export
+      ExportDeclaration() {
+        moduleType = 'esm';
+      },
+
+      // CJS: module.exports
+      ExpressionStatement({ node: { expression } }) {
+        if (expression.operator === '=') {
+          moduleType = 'cjs';
+        }
+      },
+    });
+
+    modulesMap.add({
+      id: modulesMap.size, // 0 is the first id
+      ast,
+      path: filePath, // an absolute path
+      type: moduleType,
+    });
   }
 
   return modulesMap;

@@ -84,6 +84,7 @@ function transformAst(entryDir, modulesMap) {
             // import A from 'module'
             case 'ImportDefaultSpecifier': {
               if (local.name === localName) {
+                // A -> __BUNDLER__{id}_DEFAULT.d
                 assignment = t.identifier(`${prefix}${parentModuleId}_DEFAULT.d`);
               }
               break;
@@ -110,6 +111,7 @@ function transformAst(entryDir, modulesMap) {
                 );
 
                 if (imported.name === 'default') {
+                  // A -> __BUNDLER__{id}_DEFAULT.d
                   assignment = t.identifier(`${prefix}${parentModuleId}_DEFAULT.d`);
                 }
               }
