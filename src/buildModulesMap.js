@@ -25,37 +25,43 @@ async function buildModulesMap(entryDir, entryFilename) {
 
     try {
       const ast = parse(readFileSync(filePath, 'utf-8'));
-      let type = 'esm';
+      let moduleType = 'none';
 
       traverse(ast, {
-        // import
+        // ESM: import
         ImportDeclaration({ node: { type, source } }) {
-          type = 'esm';
+          moduleType = 'esm';
           walkDeps(filePath, source.value);
         },
 
-        // require
+        // CJS: require
         CallExpression({ node: { callee, arguments: args } }) {
           if (callee.type === 'Identifier' && callee.name === 'require') {
-            type = 'cjs';
+            moduleType = 'cjs';
             walkDeps(filePath, args[0].value);
           }
+        },
+
+        // ESM: export
+        ExportDeclaration() {
+          moduleType = 'esm';
         },
 
         // check ESM or CJS
         // exports or module.exports or ESM export
         ExpressionStatement({ node: { expression } }) {
+          // module.exports
           if (expression.operator === '=') {
-            type = 'cjs';
+            moduleType = 'cjs';
           }
         },
       });
 
       modulesMap.add({
-        id: modulesMap.size, // the entry point's id is 0
+        id: modulesMap.size, // 0 is the first id
         ast,
         path: filePath, // an absolute path
-        type, // in fact, CJS as default is better
+        type: moduleType,
       });
     } catch (e) {
       console.warn('could not find the module:', filePath);

@@ -39,7 +39,6 @@
   return require(1);
 })({
   0: function (module, exports, require) {
-    require.__addEsmFlag(exports);
     console.log("hello world");
   },
   1: function (module, exports, require) {
