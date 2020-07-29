@@ -52,8 +52,6 @@
     });
   },
   1: function (module, exports, require) {
-    require.__addEsmFlag(exports);
-
     const __BUNDLER__0 = require(0);
 
     const __BUNDLER__0_DEFAULT = require.__getDefaultExports(__BUNDLER__0);

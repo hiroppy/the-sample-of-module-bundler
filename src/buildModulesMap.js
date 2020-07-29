@@ -23,6 +23,7 @@ async function buildModulesMap(entryDir, entryFilename) {
 
     let ast;
     let moduleType = 'none';
+    let hasESMExport = false;
 
     try {
       ast = parse(readFileSync(filePath, 'utf-8'));
@@ -50,6 +51,7 @@ async function buildModulesMap(entryDir, entryFilename) {
       // ESM: export
       ExportDeclaration() {
         moduleType = 'esm';
+        hasESMExport = true;
       },
 
       // CJS: module.exports
@@ -65,6 +67,7 @@ async function buildModulesMap(entryDir, entryFilename) {
       ast,
       path: filePath, // an absolute path
       type: moduleType,
+      hasESMExport,
     });
   }
 

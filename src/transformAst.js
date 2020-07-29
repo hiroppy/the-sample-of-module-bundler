@@ -12,11 +12,11 @@ const defaultExportName = '__default__';
 
 // actually it's better to do this together with ID replacement, but this is a sample so I divided it here
 function transformAst(entryDir, modulesMap) {
-  for (const { id, ast, path: currentPath, type } of modulesMap.values()) {
+  for (const { id, ast, path: currentPath, type, hasESMExport } of modulesMap.values()) {
     const exporters = {};
 
     // add __esModule flag to `exports` if a module is ESM
-    if (type === 'esm') {
+    if (hasESMExport) {
       ast.program.body.unshift(
         // add require.__addEsmFlag(exports) to body
         t.callExpression(t.identifier('require.__addEsmFlag'), [t.identifier('exports')])

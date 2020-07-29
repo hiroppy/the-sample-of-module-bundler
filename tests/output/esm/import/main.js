@@ -44,8 +44,6 @@
     console.log("hello world");
   },
   1: function (module, exports, require) {
-    require.__addEsmFlag(exports);
-
     require(0);
   },
 });

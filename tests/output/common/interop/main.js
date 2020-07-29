@@ -94,8 +94,6 @@
     });
   },
   4: function (module, exports, require) {
-    require.__addEsmFlag(exports);
-
     const __BUNDLER__3 = require(3);
 
     const __BUNDLER__3_DEFAULT = require.__getDefaultExports(__BUNDLER__3);
@@ -110,8 +108,6 @@
     console.log("---- default.js ----");
   },
   5: function (module, exports, require) {
-    require.__addEsmFlag(exports);
-
     const __BUNDLER__1 = require(1);
 
     const __BUNDLER__1_DEFAULT = require.__getDefaultExports(__BUNDLER__1);

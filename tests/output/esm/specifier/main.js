@@ -51,8 +51,6 @@
     });
   },
   1: function (module, exports, require) {
-    require.__addEsmFlag(exports);
-
     const __BUNDLER__0 = require(0);
 
     console.log(__BUNDLER__0["hi"], __BUNDLER__0["world"]);

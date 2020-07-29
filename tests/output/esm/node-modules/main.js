@@ -3070,8 +3070,6 @@ object-assign
     }
   },
   6: function (module, exports, require) {
-    require.__addEsmFlag(exports);
-
     const __BUNDLER__5 = require(5);
 
     const __BUNDLER__5_DEFAULT = require.__getDefaultExports(__BUNDLER__5);
