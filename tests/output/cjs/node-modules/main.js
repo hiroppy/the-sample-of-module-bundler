@@ -15,14 +15,6 @@
     return module.exports;
   }
 
-  require.__getDefaultExports = (module) => {
-    const getter = module.__esModule ? () => module["default"] : () => module;
-
-    require.__defineExports(getter, { d: getter });
-
-    return getter;
-  };
-
   return require(6);
 })({
   0: function (module, exports, require) {
