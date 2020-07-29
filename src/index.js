@@ -3,6 +3,7 @@
 const { promises, readFileSync } = require('fs');
 const { dirname, basename, join } = require('path');
 const Terser = require('terser');
+const prettier = require('prettier');
 const { mainTemplate } = require('./template');
 const { getModule, resolveModulePath } = require('./utils/module');
 const { transformAst } = require('./transformAst');
@@ -24,7 +25,7 @@ async function bundler({ entry, output }) {
   const { code: minifiedCode } = Terser.minify(outputCode);
 
   // export bundled code
-  await promises.writeFile(output, outputCode);
+  await promises.writeFile(output, prettier.format(outputCode));
   await promises.writeFile(join(dirname(output), minifiedFilename), minifiedCode);
 }
 

@@ -12,6 +12,7 @@
     "@babel/parser": "^7.9.6",
     "@babel/traverse": "^7.9.6",
     "@babel/types": "^7.10.1",
+    "prettier": "^2.0.5",
     "terser": "^4.7.0"
   },
   "devDependencies": {
