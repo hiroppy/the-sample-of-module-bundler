@@ -28,8 +28,10 @@
     Object.defineProperty(exports, "__esModule", { value: true });
   };
 
-  require.__getDefaultExports = (module) => {
-    const getter = module.__esModule ? () => module["default"] : () => module;
+  require.__getDefaultExports = (exports) => {
+    const getter = exports.__esModule
+      ? () => exports["default"]
+      : () => exports;
 
     require.__defineExports(getter, { d: getter });
 

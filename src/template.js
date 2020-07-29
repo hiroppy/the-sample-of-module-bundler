@@ -39,8 +39,8 @@ const addEsmFlag = () =>
 // keep for compatibility between ESM and CJS
 const getDefaultExports = () =>
   `
-    require.__getDefaultExports = (module) => {
-      const getter = module.__esModule ? () => module['default'] : () => module;
+    require.__getDefaultExports = (exports) => {
+      const getter = exports.__esModule ? () => exports['default'] : () => exports;
 
       require.__defineExports(getter, { d: getter });
 
